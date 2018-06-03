@@ -1,0 +1,82 @@
+{
+	"info": {
+		"_postman_id": "d22630a0-7063-4e54-a8cc-20782773afe4",
+		"name": "BoxUp",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Version",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:5950",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5950"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CreateBox",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"test-folder\",\n\t\"location\": \"D:\\\\Projects\\\\boxup\\\\TestFolder\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:5950/CreateBox",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5950",
+					"path": [
+						"CreateBox"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Boxes",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"location\": \"D:\\\\Projects\\\\boxup\\\\TestFolder\",\n\t\"name\": \"test-folder\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:5950/Boxes",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5950",
+					"path": [
+						"Boxes"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

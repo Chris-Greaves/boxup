@@ -1,8 +1,8 @@
 package main
 
 import (
-	"time"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -57,9 +57,15 @@ var routes = Routes{
 		Version,
 	},
 	Route{
+		"GetBoxes",
+		"GET",
+		"/Boxes",
+		GetBoxes,
+	},
+	Route{
 		"CreateBox",
 		"POST",
-		"/CreateBox/{name}",
+		"/CreateBox",
 		CreateBox,
 	},
 }
