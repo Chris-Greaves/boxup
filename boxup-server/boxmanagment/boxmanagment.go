@@ -1,13 +1,16 @@
-package main
+package boxmanagment
 
 import (
+	"compress/gzip"
+	"io"
 	"errors"
 	"os"
 )
 
 var (
-	Boxes          []Box
-	ErrBoxConflict = errors.New("a Box with the same name already exists")
+	Boxes          		= map[string]Box{}
+	ErrBoxConflict 		= errors.New("a Box with the same name already exists")
+	ErrBoxDoesntExist	= errors.New("Box doesnt exist")
 )
 
 func AddBox(box Box) (err error) {
@@ -21,7 +24,9 @@ func AddBox(box Box) (err error) {
 		return err
 	}
 
-	Boxes = append(Boxes, box)
+	Boxes[box.Name] = box
+
+	//Boxes = append(Boxes, box)
 	return err
 }
 
@@ -39,4 +44,17 @@ func CheckDirectoryExists(dir string) (err error) {
 		return err
 	}
 	return nil
+}
+
+func GetBox(name string) (io.Reader, error) {
+	if _, ok := Boxes[name]; !ok {
+		return nil, ErrBoxDoesntExist
+	}
+
+	node, err := os.Open(Boxes[name].Location)
+	if err != nil {
+		return nil, err
+	}
+
+	return gzip.NewReader(node)
 }

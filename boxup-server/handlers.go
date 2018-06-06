@@ -1,9 +1,13 @@
 package main
 
 import (
+	"io"
+	"github.com/gorilla/mux"
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"boxup/boxup-server/boxmanagment"
 )
 
 func Version(w http.ResponseWriter, r *http.Request) {
@@ -12,11 +16,11 @@ func Version(w http.ResponseWriter, r *http.Request) {
 
 func GetBoxes(w http.ResponseWriter, r *http.Request) {
 	encoder := json.NewEncoder(w)
-	encoder.Encode(Boxes)
+	encoder.Encode(boxmanagment.Boxes)
 }
 
 func CreateBox(w http.ResponseWriter, r *http.Request) {
-	var box Box
+	var box boxmanagment.Box
 	var err error
 	decoder := json.NewDecoder(r.Body)
 
@@ -27,10 +31,10 @@ func CreateBox(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = AddBox(box)
+	err = boxmanagment.AddBox(box)
 	if err != nil {
 		fmt.Fprintf(w, "An Error occured: %v", err)
-		if err == ErrBoxConflict {
+		if err == boxmanagment.ErrBoxConflict {
 			w.WriteHeader(409)
 			return
 		}
@@ -39,4 +43,23 @@ func CreateBox(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Fprintf(w, "%v box created", box.Name)
+}
+
+func GetBox(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	name := vars["name"]
+
+	zip, err := boxmanagment.GetBox(name)
+
+	if err != nil {
+		fmt.Fprintf(w, "An Error occured: %v", err)
+		w.WriteHeader(400)
+		return
+	}
+
+	if _, err := io.Copy(w, zip); err != nil {
+		fmt.Fprintf(w, "An Error occured: %v", err)
+		w.WriteHeader(500)
+		return
+	}
 }

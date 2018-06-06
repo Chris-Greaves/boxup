@@ -1,4 +1,4 @@
-package main
+package boxmanagment
 
 type Box struct {
 	Name     string `json:"name"`
