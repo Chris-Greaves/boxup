@@ -1,11 +1,11 @@
 package main
 
 import (
-	"io"
-	"github.com/gorilla/mux"
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"github.com/gorilla/mux"
 
 	"boxup/boxup-server/boxmanagment"
 )
@@ -49,15 +49,15 @@ func GetBox(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	name := vars["name"]
 
-	zip, err := boxmanagment.GetBox(name)
+	err := boxmanagment.GetBoxZip(name, w)
 
 	if err != nil {
-		fmt.Fprintf(w, "An Error occured: %v", err)
-		w.WriteHeader(400)
-		return
-	}
+		if err == boxmanagment.ErrBoxDoesntExist {
+			fmt.Fprintf(w, "An Error occured: %v", err)
+			w.WriteHeader(400)
+			return
+		}
 
-	if _, err := io.Copy(w, zip); err != nil {
 		fmt.Fprintf(w, "An Error occured: %v", err)
 		w.WriteHeader(500)
 		return

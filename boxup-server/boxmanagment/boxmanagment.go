@@ -1,16 +1,19 @@
 package boxmanagment
 
 import (
+	"archive/tar"
 	"compress/gzip"
-	"io"
 	"errors"
+	"io"
 	"os"
+	"path/filepath"
+	"strings"
 )
 
 var (
-	Boxes          		= map[string]Box{}
-	ErrBoxConflict 		= errors.New("a Box with the same name already exists")
-	ErrBoxDoesntExist	= errors.New("Box doesnt exist")
+	Boxes             = map[string]Box{}
+	ErrBoxConflict    = errors.New("a Box with the same name already exists")
+	ErrBoxDoesntExist = errors.New("Box doesnt exist")
 )
 
 func AddBox(box Box) (err error) {
@@ -57,4 +60,55 @@ func GetBox(name string) (io.Reader, error) {
 	}
 
 	return gzip.NewReader(node)
+}
+
+func GetBoxZip(name string, writer io.Writer) error {
+	if _, ok := Boxes[name]; !ok {
+		return ErrBoxDoesntExist
+	}
+
+	gzipwriter := gzip.NewWriter(writer)
+	tarball := tar.NewWriter(gzipwriter)
+	defer tarball.Close()
+
+	info, err := os.Stat(Boxes[name].Location)
+	if err != nil {
+		return err
+	}
+
+	var baseDir string
+	if info.IsDir() {
+		baseDir = filepath.Base(Boxes[name].Location)
+	}
+
+	return filepath.Walk(Boxes[name].Location,
+		func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			header, err := tar.FileInfoHeader(info, info.Name())
+			if err != nil {
+				return err
+			}
+
+			if baseDir != "" {
+				header.Name = filepath.Join(baseDir, strings.TrimPrefix(path, Boxes[name].Location))
+			}
+
+			if err := tarball.WriteHeader(header); err != nil {
+				return err
+			}
+
+			if info.IsDir() {
+				return nil
+			}
+
+			file, err := os.Open(path)
+			if err != nil {
+				return err
+			}
+			defer file.Close()
+			_, err = io.Copy(tarball, file)
+			return err
+		})
 }
