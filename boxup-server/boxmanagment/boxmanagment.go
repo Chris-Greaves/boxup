@@ -68,6 +68,7 @@ func GetBoxZip(name string, writer io.Writer) error {
 	}
 
 	gzipwriter := gzip.NewWriter(writer)
+	defer gzipwriter.Close()
 	tarball := tar.NewWriter(gzipwriter)
 	defer tarball.Close()
 
