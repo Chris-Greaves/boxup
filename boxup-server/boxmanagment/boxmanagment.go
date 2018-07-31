@@ -49,19 +49,6 @@ func CheckDirectoryExists(dir string) (err error) {
 	return nil
 }
 
-func GetBox(name string) (io.Reader, error) {
-	if _, ok := Boxes[name]; !ok {
-		return nil, ErrBoxDoesntExist
-	}
-
-	node, err := os.Open(Boxes[name].Location)
-	if err != nil {
-		return nil, err
-	}
-
-	return gzip.NewReader(node)
-}
-
 func GetBoxZip(name string, writer io.Writer) error {
 	if _, ok := Boxes[name]; !ok {
 		return ErrBoxDoesntExist
