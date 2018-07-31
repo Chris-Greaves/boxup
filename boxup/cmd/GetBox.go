@@ -50,9 +50,16 @@ To specify a port use --port 5656`,
 		outputFlag := cmd.Flag("output")
 		fmt.Printf("output:%v\n", outputFlag.Value.String())
 
-		err := getBox(hostFlag.Value.String(), portFlag.Value.String(), outputFlag.Value.String(), args[0])
-		if err != nil {
-			fmt.Printf("ERROR: %v", err)
+		for _, arg := range args {
+			fmt.Printf("\nUnboxing %v\n", arg)
+
+			err := getBox(hostFlag.Value.String(), portFlag.Value.String(), outputFlag.Value.String(), arg)
+			if err != nil {
+				fmt.Printf("Error unboxing %v: %v", arg, err)
+				continue
+			}
+
+			fmt.Printf("\nSuccessfully unboxed %v\n", arg)
 		}
 	},
 }
