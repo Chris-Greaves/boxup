@@ -23,13 +23,24 @@ import (
 
 // GetBoxCmd represents the GetBox command
 var GetBoxCmd = &cobra.Command{
-	Use:   "GetBox [box name]",
-	Short: "Get a Box from a BoxUp Server",
-	Long: `This command will get the contents of a box hosted on a BoxUp Server.
+	Use:   "GetBox [box names]",
+	Short: "Get Box(s) from a BoxUp Server",
+	Long: `This command will get the contents of boxs hosted on a BoxUp Server.
 	
 The files and directories will be place wherever the current working directory is unless specified using the -o flag
 Will assume local BoxUp Server unless specifed using --host http://domain.com or --host http://10.0.0.1
-To specify a port use --port 5656`,
+To specify a port use --port 5656
+
+Examples:
+
+Get box and output to specific folder:
+  boxup GetBox -o C:\output test-folder
+
+Get multiple boxes:
+  boxup GetBox folder1 folder2
+	
+Specify server:
+  boxup GetBox --host localhost --port 5950 test-folder`,
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 1 {
 			return errors.New("requires at least one arg")
