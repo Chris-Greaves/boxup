@@ -26,8 +26,8 @@ func CreateBox(w http.ResponseWriter, r *http.Request) {
 
 	err = decoder.Decode(&box)
 	if err != nil {
-		fmt.Fprintf(w, "An Error occured: %v", err)
 		w.WriteHeader(400)
+		fmt.Fprintf(w, "An Error occured: %v", err)
 		return
 	}
 
@@ -53,13 +53,13 @@ func GetBox(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		if err == boxmanagment.ErrBoxDoesntExist {
-			fmt.Fprintf(w, "An Error occured: %v", err)
 			w.WriteHeader(400)
+			fmt.Fprintf(w, "An Error occured: %v", err)
 			return
 		}
 
-		fmt.Fprintf(w, "An Error occured: %v", err)
 		w.WriteHeader(500)
+		fmt.Fprintf(w, "An Error occured: %v", err)
 		return
 	}
 }
