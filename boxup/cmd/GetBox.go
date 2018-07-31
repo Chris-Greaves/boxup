@@ -15,14 +15,8 @@
 package cmd
 
 import (
-	"archive/tar"
-	"compress/gzip"
 	"errors"
 	"fmt"
-	"io"
-	"net/http"
-	"os"
-	"path/filepath"
 
 	"github.com/spf13/cobra"
 )
@@ -43,9 +37,12 @@ To specify a port use --port 5656`,
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Printf("Args:\n")
 		for index, arg := range args {
-			fmt.Printf("%v:%v\n", index, arg)
+			fmt.Printf("\t%v:%v\n", index, arg)
 		}
+		fmt.Printf("\n")
+
 		hostFlag := cmd.Flag("host")
 		fmt.Printf("host:%v\n", hostFlag.Value.String())
 		portFlag := cmd.Flag("port")
@@ -53,22 +50,9 @@ To specify a port use --port 5656`,
 		outputFlag := cmd.Flag("output")
 		fmt.Printf("output:%v\n", outputFlag.Value.String())
 
-		resp, err := http.Get("http://localhost:5950/GetBox/test-folder")
+		err := getBox(hostFlag.Value.String(), portFlag.Value.String(), outputFlag.Value.String(), args[0])
 		if err != nil {
-			fmt.Printf("Error occured: %v", err)
-		}
-		defer resp.Body.Close()
-
-		gzipReader, err := gzip.NewReader(resp.Body)
-		if err != nil {
-			fmt.Printf("Error occured: %v", err)
-		}
-		defer gzipReader.Close()
-
-		// err = untar(tarReader, outputFlag.Value.String())
-		err = untar(gzipReader, "D:\\Projects\\boxup\\output")
-		if err != nil {
-			fmt.Printf("Error occured unzipping: %v", err)
+			fmt.Printf("ERROR: %v", err)
 		}
 	},
 }
@@ -81,38 +65,4 @@ func init() {
 	GetBoxCmd.Flags().String("host", "localhost", "Specify the host to connect")
 	GetBoxCmd.Flags().Int("port", 5950, "Specify the port to use")
 	GetBoxCmd.Flags().StringP("output", "o", "", "Specify the output directory (default Current Directory)")
-}
-
-func untar(reader io.Reader, target string) error {
-	tarReader := tar.NewReader(reader)
-
-	for {
-		header, err := tarReader.Next()
-		if err == io.EOF {
-			break
-		} else if err != nil {
-			return errors.New(fmt.Sprintf("Error reading next: %v", err))
-		}
-
-		path := filepath.Join(target, header.Name)
-		info := header.FileInfo()
-		if info.IsDir() {
-			if err = os.MkdirAll(path, info.Mode()); err != nil {
-				return errors.New(fmt.Sprintf("Error making directory: %v", err))
-			}
-			continue
-		}
-
-		file, err := os.OpenFile(path, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, info.Mode())
-		if err != nil {
-			return errors.New(fmt.Sprintf("Error opening file: %v", err))
-		}
-		defer file.Close()
-		_, err = io.Copy(file, tarReader)
-		if err != nil {
-			return errors.New(fmt.Sprintf("Error copying file: %v", err))
-		}
-	}
-
-	return nil
 }
