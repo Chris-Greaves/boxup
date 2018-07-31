@@ -5,6 +5,7 @@ import (
 	"compress/gzip"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -14,6 +15,10 @@ func getBox(host, port, output, name string) error {
 	resp, err := http.Get(generateGetBoxURL(host, port, name))
 	if err != nil {
 		return fmt.Errorf("Error occured contacting server: %v", err)
+	} else if resp.StatusCode != 200 {
+		bodyBytes, _ := ioutil.ReadAll(resp.Body)
+		bodyString := string(bodyBytes)
+		return fmt.Errorf("Error occured contacting server: Status code returned was not 200: %v (%v) Message: '%v'", resp.StatusCode, resp.Status, bodyString)
 	}
 	defer resp.Body.Close()
 
