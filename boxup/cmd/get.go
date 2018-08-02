@@ -64,7 +64,7 @@ Specify server:
 		for _, arg := range args {
 			fmt.Printf("\nUnboxing %v\n", arg)
 
-			err := get(hostFlag.Value.String(), portFlag.Value.String(), outputFlag.Value.String(), arg)
+			err := getBox(hostFlag.Value.String(), portFlag.Value.String(), outputFlag.Value.String(), arg)
 			if err != nil {
 				fmt.Printf("Error unboxing %v: %v", arg, err)
 				continue
