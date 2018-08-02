@@ -21,9 +21,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// GetBoxCmd represents the GetBox command
-var GetBoxCmd = &cobra.Command{
-	Use:   "GetBox [box names]",
+// getCmd represents the get command
+var getCmd = &cobra.Command{
+	Use:   "get [box names]",
 	Short: "Get Box(s) from a BoxUp Server",
 	Long: `This command will get the contents of boxs hosted on a BoxUp Server.
 	
@@ -34,13 +34,13 @@ To specify a port use --port 5656
 Examples:
 
 Get box and output to specific folder:
-  boxup GetBox -o C:\output test-folder
+  boxup get -o C:\output test-folder
 
 Get multiple boxes:
-  boxup GetBox folder1 folder2
+  boxup get folder1 folder2
 	
 Specify server:
-  boxup GetBox --host localhost --port 5950 test-folder`,
+  boxup get --host localhost --port 5950 test-folder`,
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 1 {
 			return errors.New("requires at least one arg")
@@ -64,7 +64,7 @@ Specify server:
 		for _, arg := range args {
 			fmt.Printf("\nUnboxing %v\n", arg)
 
-			err := getBox(hostFlag.Value.String(), portFlag.Value.String(), outputFlag.Value.String(), arg)
+			err := get(hostFlag.Value.String(), portFlag.Value.String(), outputFlag.Value.String(), arg)
 			if err != nil {
 				fmt.Printf("Error unboxing %v: %v", arg, err)
 				continue
@@ -76,11 +76,11 @@ Specify server:
 }
 
 func init() {
-	rootCmd.AddCommand(GetBoxCmd)
+	rootCmd.AddCommand(getCmd)
 
 	// Here you will define your flags and configuration settings.
 
-	GetBoxCmd.Flags().String("host", "localhost", "Specify the host to connect")
-	GetBoxCmd.Flags().Int("port", 5950, "Specify the port to use")
-	GetBoxCmd.Flags().StringP("output", "o", "", "Specify the output directory (default Current Directory)")
+	getCmd.Flags().String("host", "localhost", "Specify the host to connect")
+	getCmd.Flags().Int("port", 5950, "Specify the port to use")
+	getCmd.Flags().StringP("output", "o", "", "Specify the output directory (default Current Directory)")
 }
