@@ -12,6 +12,7 @@ import (
 )
 
 func getBox(host, port, output, name string) error {
+	fmt.Println("Getting box from server")
 	resp, err := http.Get(generateGetBoxURL(host, port, name))
 	if err != nil {
 		return fmt.Errorf("Error occured contacting server: %v", err)
@@ -22,6 +23,7 @@ func getBox(host, port, output, name string) error {
 	}
 	defer resp.Body.Close()
 
+	fmt.Println("Uncompressing stream")
 	gzipReader, err := gzip.NewReader(resp.Body)
 	if err != nil {
 		return fmt.Errorf("Error occured creating gzip reader: %v", err)
@@ -35,6 +37,7 @@ func getBox(host, port, output, name string) error {
 		}
 	}
 
+	fmt.Println("Unzipping stream")
 	err = untar(gzipReader, output)
 	if err != nil {
 		return fmt.Errorf("Error occured unzipping: %v", err)
@@ -58,6 +61,7 @@ func untar(reader io.Reader, target string) error {
 		}
 
 		path := filepath.Join(target, header.Name)
+		fmt.Printf("Creating %v\n", path)
 		info := header.FileInfo()
 		if info.IsDir() {
 			if err = os.MkdirAll(path, info.Mode()); err != nil {

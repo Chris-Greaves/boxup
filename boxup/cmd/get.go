@@ -70,7 +70,7 @@ Specify server:
 				continue
 			}
 
-			fmt.Printf("\n--- Successfully unboxed %v ---\n", arg)
+			fmt.Printf("--- Successfully unboxed %v ---\n", arg)
 		}
 	},
 }
