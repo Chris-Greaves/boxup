@@ -62,7 +62,7 @@ Specify server:
 		fmt.Printf("output:%v\n", outputFlag.Value.String())
 
 		for _, arg := range args {
-			fmt.Printf("\nUnboxing %v\n", arg)
+			fmt.Printf("\n--- Unboxing %v ---\n", arg)
 
 			err := getBox(hostFlag.Value.String(), portFlag.Value.String(), outputFlag.Value.String(), arg)
 			if err != nil {
@@ -70,7 +70,7 @@ Specify server:
 				continue
 			}
 
-			fmt.Printf("\nSuccessfully unboxed %v\n", arg)
+			fmt.Printf("\n--- Successfully unboxed %v ---\n", arg)
 		}
 	},
 }
@@ -80,7 +80,5 @@ func init() {
 
 	// Here you will define your flags and configuration settings.
 
-	getCmd.Flags().String("host", "localhost", "Specify the host to connect")
-	getCmd.Flags().Int("port", 5950, "Specify the port to use")
 	getCmd.Flags().StringP("output", "o", "", "Specify the output directory (default Current Directory)")
 }
