@@ -16,7 +16,7 @@ func Version(w http.ResponseWriter, r *http.Request) {
 
 func GetBoxes(w http.ResponseWriter, r *http.Request) {
 	encoder := json.NewEncoder(w)
-	encoder.Encode(boxmanagment.Boxes)
+	encoder.Encode(boxmanagment.GetBoxes())
 }
 
 func CreateBox(w http.ResponseWriter, r *http.Request) {

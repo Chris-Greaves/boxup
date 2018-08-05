@@ -49,6 +49,15 @@ func CheckDirectoryExists(dir string) (err error) {
 	return nil
 }
 
+func GetBoxes() []Box {
+	var boxes []Box
+	for _, box := range Boxes {
+		boxes = append(boxes, box)
+	}
+
+	return boxes
+}
+
 func GetBoxZip(name string, writer io.Writer) error {
 	if _, ok := Boxes[name]; !ok {
 		return ErrBoxDoesntExist
