@@ -109,3 +109,7 @@ func GetBoxZip(name string, writer io.Writer) error {
 			return err
 		})
 }
+
+func RemoveBox(name string) {
+	delete(Boxes, name)
+}

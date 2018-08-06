@@ -63,3 +63,12 @@ func GetBox(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func RemoveBox(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	name := vars["name"]
+
+	boxmanagment.RemoveBox(name)
+
+	w.WriteHeader(204)
+}

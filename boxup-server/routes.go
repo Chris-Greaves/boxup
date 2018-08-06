@@ -74,4 +74,10 @@ var routes = Routes{
 		"/CreateBox",
 		CreateBox,
 	},
+	Route{
+		"RemoveBox",
+		"DELETE",
+		"/RemoveBox/{name}",
+		RemoveBox,
+	},
 }
