@@ -20,6 +20,7 @@ func addBox(host, port, name, path string) error {
 	if err != nil {
 		return fmt.Errorf("Error occured calling Server: %v", err)
 	}
+	defer resp.Body.Close()
 
 	bodyBytes, _ := ioutil.ReadAll(resp.Body)
 	bodyString := string(bodyBytes)
