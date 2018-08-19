@@ -63,9 +63,21 @@ var routes = Routes{
 		GetBoxes,
 	},
 	Route{
+		"GetBox",
+		"GET",
+		"/GetBox/{name}",
+		GetBox,
+	},
+	Route{
 		"CreateBox",
 		"POST",
 		"/CreateBox",
 		CreateBox,
+	},
+	Route{
+		"RemoveBox",
+		"DELETE",
+		"/RemoveBox/{name}",
+		RemoveBox,
 	},
 }
