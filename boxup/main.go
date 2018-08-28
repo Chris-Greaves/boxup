@@ -1,7 +1,7 @@
 package main
 
 import (
-	"boxup/cmd"
+	"github.com/chris-greaves/boxup/boxup/cmd"
 )
 
 func main() {

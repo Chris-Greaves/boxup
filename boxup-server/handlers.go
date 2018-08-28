@@ -7,7 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"boxup-server/boxmanagment"
+	"github.com/chris-greaves/boxup/boxup-server/boxmanagment"
 )
 
 func Version(w http.ResponseWriter, r *http.Request) {
