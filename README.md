@@ -17,16 +17,14 @@ Once you have this installed and have tested its working ([see here](https://gol
 
 ### Installing Client
 
-To get the client, simply type `go get -u github.com/chris-greaves/boxup/boxup`. This will pull down the code from github, along with all its dependencies.
+To get the client executable, simply enter `go install github.com/chris-greaves/boxup/boxup` into a terminal. This will pull down the code and build it.
 
-Once this has finished, go into the newly created "boxup" folder, and run the command `go build`. You should see a executable file called boxup (The file created will vary depending on the OS)
-
-You can move this file wherever, but the best place would be a directory referenced by PATH. this means you can run the commands without having to reference the path to the file.
+Providing that your environment is setup correctly, you should see the boxup executable in the bin folder of your first directory on GOPATH.
 
 ### Installing Server
 
-To get the client, simply type `go get -u github.com/chris-greaves/boxup/boxup-server`. This will pull down the code from github, along with all its dependencies.
+To get the client executable, simply enter `go install github.com/chris-greaves/boxup/boxup-server` into a terminal. This will pull down the code and build it.
 
-Once this has finished, go into the newly created "boxup-server" folder, and run the command `go build` You should see a executable file called "boxup-server" (The file created will vary depending on the OS)
+Providing that your environment is setup correctly, you should see the boxup-server executable in the bin folder of your first directory on GOPATH.
 
 Once this file exists, you can run it and it will start hosting the boxup API for any boxup CLIs to connect to.
