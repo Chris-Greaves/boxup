@@ -1,9 +1,11 @@
 package service
 
 import (
+	"io"
 	"log"
 	"os"
 	"path/filepath"
+	"time"
 
 	pb "github.com/chris-greaves/boxup/boxup_service"
 	"github.com/pkg/errors"
@@ -54,7 +56,10 @@ func getExistingBoxes(path string) map[string]Box {
 	return boxes
 }
 
+// List gets a list of all the Boxes currently stored by the server
 func (s *BoxUpService) List(query *pb.SearchQuery, stream pb.BoxUpService_ListServer) error {
+	s.logger.Printf("Received call to \"List\". Query string=%v", nil)
+	start := time.Now()
 	for _, box := range s.boxes {
 		err := stream.Send(&pb.BoxInfo{Name: box.Name})
 		if err != nil {
@@ -63,13 +68,52 @@ func (s *BoxUpService) List(query *pb.SearchQuery, stream pb.BoxUpService_ListSe
 			return err
 		}
 	}
+	s.logger.Printf("Call to \"List\" took %v", time.Since(start))
 	return nil
 }
 
-func (s *BoxUpService) Get(box *pb.BoxInfo, stream pb.BoxUpService_GetServer) error {
+// Get retrieves a Box from the server
+func (s *BoxUpService) Get(info *pb.BoxInfo, stream pb.BoxUpService_GetServer) error {
+	s.logger.Printf("Received call to \"Get\". BoxName=%v", info.Name)
+	start := time.Now()
+
+	var writing = true
+	box, ok := s.boxes[info.Name]
+	if !ok {
+		return errors.New("box not found")
+	}
+
+	file, err := os.Open(box.Path)
+	if err != nil {
+		return errors.Wrap(err, "error occurred when opening file on server")
+	}
+
+	buf := make([]byte, s.streamBitSize)
+	for writing {
+		n, err := file.Read(buf)
+
+		if err != nil {
+			if err == io.EOF {
+				writing = false
+				err = nil
+				continue
+			}
+
+			return errors.Wrap(err,
+				"errored while reading file")
+		}
+
+		stream.Send(&pb.BoxChunk{
+			Filename: info.Name,
+			Data:     buf[:n],
+		})
+	}
+
+	s.logger.Printf("Call to \"Get\" took %v", time.Since(start))
 	return nil
 }
 
+// Send streams a Box up to the server to be stored
 func (s *BoxUpService) Send(stream pb.BoxUpService_SendServer) error {
 	return nil
 }
