@@ -24,6 +24,9 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
+// SearchQuery is an object that allows you to specify search criteria for looking up stored boxes.
+//
+// Currently not implimented
 type SearchQuery struct {
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -55,6 +58,7 @@ func (m *SearchQuery) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_SearchQuery proto.InternalMessageInfo
 
+// BoxInfo contains information about a Box.
 type BoxInfo struct {
 	Name                 string   `protobuf:"bytes,1,opt,name=Name,proto3" json:"Name,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -94,6 +98,7 @@ func (m *BoxInfo) GetName() string {
 	return ""
 }
 
+// BoxChunk contains the Filename of the Box, and some Data in the form of bytes.
 type BoxChunk struct {
 	Filename             string   `protobuf:"bytes,1,opt,name=Filename,proto3" json:"Filename,omitempty"`
 	Data                 []byte   `protobuf:"bytes,2,opt,name=Data,proto3" json:"Data,omitempty"`
@@ -179,8 +184,11 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type BoxUpServiceClient interface {
+	// Obtains a list of all currently available Boxes (archives) on the server.
 	List(ctx context.Context, in *SearchQuery, opts ...grpc.CallOption) (BoxUpService_ListClient, error)
+	// Obtains a Box as a stream of Chunks. Each chunk contains a number of bytes and from the Box and the Filename.
 	Get(ctx context.Context, in *BoxInfo, opts ...grpc.CallOption) (BoxUpService_GetClient, error)
+	// Accepts a stream of Box Chunks to be stored on the server. Each chunk contains a number of bytes and from the Box and the Filename.
 	Send(ctx context.Context, opts ...grpc.CallOption) (BoxUpService_SendClient, error)
 }
 
@@ -292,8 +300,11 @@ func (x *boxUpServiceSendClient) CloseAndRecv() (*BoxInfo, error) {
 
 // BoxUpServiceServer is the server API for BoxUpService service.
 type BoxUpServiceServer interface {
+	// Obtains a list of all currently available Boxes (archives) on the server.
 	List(*SearchQuery, BoxUpService_ListServer) error
+	// Obtains a Box as a stream of Chunks. Each chunk contains a number of bytes and from the Box and the Filename.
 	Get(*BoxInfo, BoxUpService_GetServer) error
+	// Accepts a stream of Box Chunks to be stored on the server. Each chunk contains a number of bytes and from the Box and the Filename.
 	Send(BoxUpService_SendServer) error
 }
 
