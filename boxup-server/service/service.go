@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	pb "github.com/chris-greaves/boxup/boxup_service"
+	"github.com/pkg/errors"
 )
 
 // Box is an Archive stored on the server
@@ -36,7 +37,7 @@ func New(storagePath string, logger *log.Logger) *BoxUpService {
 }
 
 func getExistingBoxes(path string) map[string]Box {
-	var archs = map[string]Box{}
+	var boxes = map[string]Box{}
 	filepath.Walk(path,
 		func(path string, info os.FileInfo, err error) error {
 			if info.IsDir() {
@@ -44,16 +45,24 @@ func getExistingBoxes(path string) map[string]Box {
 			}
 
 			_, filename := filepath.Split(path)
-			var arch = Box{Path: path, Name: filename}
+			var box = Box{Path: path, Name: filename}
 			log.Printf("Adding %v to list of archives", filename)
 
-			archs[filename] = arch
+			boxes[filename] = box
 			return nil
 		})
-	return archs
+	return boxes
 }
 
 func (s *BoxUpService) List(query *pb.SearchQuery, stream pb.BoxUpService_ListServer) error {
+	for _, box := range s.boxes {
+		err := stream.Send(&pb.BoxInfo{Name: box.Name})
+		if err != nil {
+			err = errors.Wrap(err, "error sending box back to client")
+			s.logger.Print(err)
+			return err
+		}
+	}
 	return nil
 }
 
