@@ -9,7 +9,7 @@ import (
 
 func init() {
 	rootCmd.PersistentFlags().StringP("host", "H", "localhost", "Specify the host to connect")
-	rootCmd.PersistentFlags().IntP("port", "P", 5950, "Specify the port to use")
+	rootCmd.PersistentFlags().IntP("port", "P", 3535, "Specify the port to use")
 }
 
 var rootCmd = &cobra.Command{
