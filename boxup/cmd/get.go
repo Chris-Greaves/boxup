@@ -15,17 +15,24 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/Chris-Greaves/boxup/boxup/stub"
 	"github.com/spf13/cobra"
 )
 
-// listCmd represents the list command
-var listCmd = &cobra.Command{
-	Use:   "list",
-	Short: "Lists all boxes on the Server",
-	Long:  `This will get all the currently active boxes hosted by the Server.`,
+// getCmd represents the get command
+var getCmd = &cobra.Command{
+	Use:   "get [Name]",
+	Short: "Gets a box from the server by name",
+	Long:  `This will stream the contents of a box down to the client and save at the current working directory.`,
+	Args: func(cmd *cobra.Command, args []string) error {
+		if len(args) < 1 {
+			return errors.New("at least one argument is required")
+		}
+		return nil
+	},
 	Run: func(cmd *cobra.Command, args []string) {
 		host := cmd.Flag("host").Value.String()
 		port := cmd.Flag("port").Value.String()
@@ -38,13 +45,14 @@ var listCmd = &cobra.Command{
 			return
 		}
 
-		err = client.List()
+		fmt.Printf("Attempting to get %v from server\n", args[0])
+		err = client.Get(args[0])
 		if err != nil {
-			fmt.Printf("Error listing boxes: %v", err)
+			fmt.Printf("Error getting box %v: %v", args[0], err)
 		}
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(listCmd)
+	rootCmd.AddCommand(getCmd)
 }
