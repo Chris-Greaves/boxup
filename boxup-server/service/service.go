@@ -132,8 +132,9 @@ func (s *BoxUpService) Send(stream pb.BoxUpService_SendServer) error {
 		chunk, err := stream.Recv()
 		if err != nil {
 			if err == io.EOF {
+				_, filename := filepath.Split(file.Name())
 				err = stream.SendAndClose(&pb.BoxInfo{
-					Name: chunk.Filename,
+					Name: filename,
 				})
 				if err != nil {
 					err = errors.Wrap(err, "failed sending and closing")
