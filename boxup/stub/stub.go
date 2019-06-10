@@ -20,6 +20,7 @@ import (
 	"io"
 	"os"
 	"path"
+	"path/filepath"
 
 	pb "github.com/chris-greaves/boxup/boxup_service"
 	"github.com/pkg/errors"
@@ -70,7 +71,11 @@ func (c *ServiceClient) List() error {
 // Get downloads a Box from the server
 func (c *ServiceClient) Get(name string) error {
 	stream, err := c.client.Get(context.Background(), &pb.BoxInfo{Name: name})
+	if err != nil {
+		return errors.Wrapf(err, "error getting stream. BoxName=%v", name)
+	}
 	defer stream.CloseSend()
+
 	wd, err := os.Getwd()
 	if err != nil {
 		return errors.Wrap(err, "error getting current directory")
@@ -96,6 +101,49 @@ func (c *ServiceClient) Get(name string) error {
 		if err != nil {
 			return errors.Wrapf(err, "failed unexpectedely while writing chunks to file. BoxName=%v", name)
 		}
+	}
+
+	return nil
+}
+
+// Send streams a file to be stored on the server
+func (c *ServiceClient) Send(path string) error {
+	stream, err := c.client.Send(context.Background())
+	if err != nil {
+		return errors.Wrapf(err, "error getting stream. Path=%v", path)
+	}
+	defer stream.CloseSend()
+
+	_, filename := filepath.Split(path)
+	var writing = true
+
+	file, err := os.Open(path)
+	if err != nil {
+		return errors.Wrapf(err, "error occurred when opening file. Path=%v", path)
+	}
+
+	buf := make([]byte, 1024)
+	for writing {
+		n, err := file.Read(buf)
+
+		if err != nil {
+			if err == io.EOF {
+				writing = false
+				err = nil
+				continue
+			}
+
+			return errors.Wrap(err, "errored while reading file")
+		}
+
+		stream.Send(&pb.BoxChunk{
+			Filename: filename,
+			Data:     buf[:n],
+		})
+	}
+	_, err = stream.CloseAndRecv()
+	if err != nil {
+		return errors.Wrapf(err, "error closing stream. Path=%v", path)
 	}
 
 	return nil
