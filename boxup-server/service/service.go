@@ -4,6 +4,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"path"
 	"path/filepath"
 	"time"
 
@@ -80,12 +81,16 @@ func (s *BoxUpService) Get(info *pb.BoxInfo, stream pb.BoxUpService_GetServer) e
 	var writing = true
 	box, ok := s.boxes[info.Name]
 	if !ok {
-		return errors.New("box not found")
+		err := errors.New("box not found")
+		s.logger.Print(err)
+		return err
 	}
 
 	file, err := os.Open(box.Path)
 	if err != nil {
-		return errors.Wrap(err, "error occurred when opening file on server")
+		err = errors.Wrap(err, "error occurred when opening file on server")
+		s.logger.Print(err)
+		return err
 	}
 
 	buf := make([]byte, s.streamBitSize)
@@ -99,8 +104,10 @@ func (s *BoxUpService) Get(info *pb.BoxInfo, stream pb.BoxUpService_GetServer) e
 				continue
 			}
 
-			return errors.Wrap(err,
+			err = errors.Wrap(err,
 				"errored while reading file")
+			s.logger.Print(err)
+			return err
 		}
 
 		stream.Send(&pb.BoxChunk{
@@ -115,5 +122,54 @@ func (s *BoxUpService) Get(info *pb.BoxInfo, stream pb.BoxUpService_GetServer) e
 
 // Send streams a Box up to the server to be stored
 func (s *BoxUpService) Send(stream pb.BoxUpService_SendServer) error {
+	s.logger.Print("Received call to \"Send\".")
+	start := time.Now()
+
+	var (
+		file *os.File
+	)
+	for {
+		chunk, err := stream.Recv()
+		if err != nil {
+			if err == io.EOF {
+				err = stream.SendAndClose(&pb.BoxInfo{
+					Name: chunk.Filename,
+				})
+				if err != nil {
+					err = errors.Wrap(err, "failed sending and closing")
+					s.logger.Print(err)
+					return err
+				}
+				break
+			}
+
+			err = errors.Wrap(err, "failed unexpectedly while retrieving chunks from stream")
+			s.logger.Print(err)
+			return err
+		}
+
+		if file == nil {
+			file, err = os.Create(path.Join(s.storagePath, chunk.Filename))
+			if err != nil {
+				err = errors.Wrap(err, "error occured creating file on server")
+				s.logger.Print(err)
+				return err
+			}
+			defer file.Close()
+		}
+
+		_, err = file.Write(chunk.Data)
+		if err != nil {
+			err = errors.Wrap(err, "failed unexpectedly while writing chunks to file")
+			s.logger.Print(err)
+			return err
+		}
+	}
+
+	_, filename := filepath.Split(file.Name())
+	s.boxes[filename] = Box{Name: filename, Path: file.Name()}
+
+	s.logger.Printf("Successfully added %v", filename)
+	s.logger.Printf("Call to \"Send\" took %v", time.Since(start))
 	return nil
 }
