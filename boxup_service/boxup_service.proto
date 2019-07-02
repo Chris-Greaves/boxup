@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package BoxUp;
+
+service BoxUpService {
+    // Obtains a list of all currently available Boxes (archives) on the server.
+    rpc List(SearchQuery) returns (stream BoxInfo) {}
+
+    // Obtains a Box as a stream of Chunks. Each chunk contains a number of bytes and from the Box and the Filename.
+    rpc Get(BoxInfo) returns (stream BoxChunk) {}
+
+    // Accepts a stream of Box Chunks to be stored on the server. Each chunk contains a number of bytes and from the Box and the Filename.
+    rpc Send(stream BoxChunk) returns (BoxInfo) {}
+}
+
+// SearchQuery is an object that allows you to specify search criteria for looking up stored boxes.
+//
+// Currently not implimented
+message SearchQuery {
+    // Might consider adding searchable fields here.
+}
+
+// BoxInfo contains information about a Box.
+message BoxInfo {
+    string Name = 1;
+}
+
+// BoxChunk contains the Filename of the Box, and some Data in the form of bytes.
+message BoxChunk {
+    string Filename = 1;
+    bytes Data = 2;
+}

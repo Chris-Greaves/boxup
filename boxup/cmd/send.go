@@ -22,11 +22,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// getCmd represents the get command
-var getCmd = &cobra.Command{
-	Use:   "get [Name]",
-	Short: "Gets a box from the server by name",
-	Long:  `This will stream the contents of a box down to the client and save at the current working directory.`,
+// sendCmd represents the get command
+var sendCmd = &cobra.Command{
+	Use:   "send [path]",
+	Short: "Send a file to be stored on the server",
+	Long:  `This will stream the contents of a file to the server and save it as a box for others to pull down.`,
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 1 {
 			return errors.New("at least one argument is required")
@@ -46,7 +46,7 @@ var getCmd = &cobra.Command{
 		}
 
 		fmt.Printf("Attempting to get %v from server\n", args[0])
-		err = client.Get(args[0])
+		err = client.Send(args[0])
 		if err != nil {
 			fmt.Printf("Error getting box %v: %v", args[0], err)
 		}
@@ -54,5 +54,5 @@ var getCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(getCmd)
+	rootCmd.AddCommand(sendCmd)
 }
