@@ -152,7 +152,7 @@ func (s *BoxUpService) Send(stream pb.BoxUpService_SendServer) error {
 		if file == nil {
 			file, err = os.Create(path.Join(s.storagePath, chunk.Filename))
 			if err != nil {
-				err = errors.Wrap(err, "error occured creating file on server")
+				err = errors.Wrap(err, "error occurred creating file on server")
 				s.logger.Print(err)
 				return err
 			}

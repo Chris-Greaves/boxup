@@ -1,13 +1,14 @@
 # BoxUp
 
-A cross platform directory hosting service, that allows you to box up and retrieve the contents of a directory.
+A cross platform file hosting service, that allows you to "box up" and retrieve files from a central file.
 
 For the full explanation on why this project exists see [here](https://christophergreaves.co.uk/projects/boxup)
 
 ## Installation
 
-Installation is easy, but will require some pre-requisite downloads.  
-I hope in the future to have a release in github with all the files pre-compiled
+You can download the binary for your os from the [Releases page](https://github.com/Chris-Greaves/boxup/releases) of this repo.
+
+To build locally please see below.
 
 ### Pre-requisite
 
@@ -27,4 +28,4 @@ To get the client executable, simply enter `go install github.com/chris-greaves/
 
 Providing that your environment is setup correctly, you should see the boxup-server executable in the bin folder of your first directory on GOPATH.
 
-Once this file exists, you can run it and it will start hosting the boxup API for any boxup CLIs to connect to.
+Once this file exists, you can run it and it will start hosting the boxup service for any boxup CLIs to connect to.
