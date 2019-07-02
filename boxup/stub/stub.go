@@ -108,6 +108,10 @@ func (c *ServiceClient) Get(name string) error {
 
 // Send streams a file to be stored on the server
 func (c *ServiceClient) Send(path string) error {
+	if !isFile(path) {
+		return errors.New("path provided is not a file")
+	}
+
 	stream, err := c.client.Send(context.Background())
 	if err != nil {
 		return errors.Wrapf(err, "error getting stream. Path=%v", path)
@@ -147,4 +151,12 @@ func (c *ServiceClient) Send(path string) error {
 	}
 
 	return nil
+}
+
+func isFile(path string) bool {
+	info, err := os.Stat(path)
+	if err != nil || info.IsDir() {
+		return false
+	}
+	return true
 }
